@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
-
+import csv
 #for loading and visualizing audio files
 import librosa
 import librosa.display
+import numpy as np
 
 from urllib.request import urlopen
 import pandas as pd
@@ -22,6 +23,21 @@ def get_wav(csvfile):
         with open(file_dir, 'wb') as f:
             f.write(html.read())
 
+
+def main(filename, name):
+    
+    df = pd.read_csv(filename, usecols=['id'])
+    for index, id in df.itertuples():
+        if len(id) < 10:
+            continue
+        i = index // 300
+        wav_file = f'audio/{name}/{id}.wav'
+        x, sr = librosa.load(wav_file, sr=100)
+        x = np.append(x,id)
+        with open(f'data_csv/{name}{i}_vectors.csv','a') as f:
+            writer = csv.writer(f)
+            writer.writerow(x)
+            print(index,id,x)
 
 
 def save_spectogram_waveplot(song_id):
@@ -69,4 +85,4 @@ def generate_graphs(csvfile):
 
 
 if __name__ == '__main__':
-    save_spectogram_waveplot('0BCUve4b3KySD9Sk8CMZ2i')
+    main('data_csv/sad_no_duplicates_no_nan.csv','sad')
